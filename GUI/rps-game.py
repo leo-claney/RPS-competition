@@ -1,9 +1,6 @@
 import pygame
 import sys
 
-ROCK = 0
-PAPER = 1
-SCISSORS = 2
 
 def get_winner(player_choice, opponent_choice):
     """Determine the winner of a rock-paper-scissors game."""

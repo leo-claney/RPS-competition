@@ -1,0 +1,7 @@
+ROCK = 'Rock'
+PAPER = 'Paper'
+SCISSORS = 'Scissors'
+CHOICES = [ROCK, PAPER, SCISSORS]
+WIN = 1
+LOSS = -1
+DRAW = 0
