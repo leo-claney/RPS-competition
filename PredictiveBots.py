@@ -81,34 +81,22 @@ class ConfidentWinner(RPSAI):
     """
     NAME = "ConfidentWinner"
 
-    def __init__(self):
-        super().__init__()
-        self.last_result = None
-
     def make_choice(self):
         """
         Predict the next move based on the last result.
         :return: The winning move based on the last result.
         """
-        if self.last_result == None:
+        if len(self.own_history) == 0 or len(self.opp_history) == 0:
             return random.choice(cfg.CHOICES)
+        
+        last_result = self.evaluate_hand(self.own_history[-1], self.opp_history[-1])
 
-        elif self.last_result == cfg.WIN:
+        if last_result == cfg.WIN:
             return self.own_history[-1]
-        elif self.last_result == cfg.LOSS:
+        elif last_result == cfg.LOSS:
             return self.opp_history[-1]
         else:
             return random.choice(cfg.CHOICES)
-        
-
-    def update_history(self, own_move, opp_move):
-        """
-        Update the history of moves and the last result.
-        :param own_move: The move made by the AI.
-        :param opp_move: The move made by the opponent.
-        """
-        super().update_history(own_move, opp_move)
-        self.last_result = self.evaluate_hand(own_move, opp_move)
 
 class UnconfidentWinner(RPSAI):
     """
@@ -117,33 +105,22 @@ class UnconfidentWinner(RPSAI):
     """
     NAME = "UnconfidentWinner"
 
-    def __init__(self):
-        super().__init__()
-        self.last_result = None
-
     def make_choice(self):
         """
         Predict the next move based on the last result.
         :return: The winning move based on the last result.
         """
-        if self.last_result == None:
+        if len(self.own_history) == 0 or len(self.opp_history) == 0:
             return random.choice(cfg.CHOICES)
+        
+        last_result = self.evaluate_hand(self.own_history[-1], self.opp_history[-1])
 
-        elif self.last_result == cfg.WIN:
+        if last_result == cfg.WIN:
             return random.choice([move for move in cfg.CHOICES if move != self.own_history[-1]])
-        elif self.last_result == cfg.LOSS:
+        elif last_result == cfg.LOSS:
             return self.own_history[-1]
         else:
             return random.choice(cfg.CHOICES)
-
-    def update_history(self, own_move, opp_move):
-        """
-        Update the history of moves and the last result.
-        :param own_move: The move made by the AI.
-        :param opp_move: The move made by the opponent.
-        """
-        super().update_history(own_move, opp_move)
-        self.last_result = self.evaluate_hand(own_move, opp_move)
 
 class StealerBot(RPSAI):
     """
@@ -164,19 +141,21 @@ class StealerBot(RPSAI):
 class SwitcherBot(RPSAI):
     """
     A bot that switches its move to cycle through the choices
+    Effectively chooses the move that would have won against the last move it played.
     """
     NAME = "SwitcherBot"
-
-    def __init__(self):
-        super().__init__()
-        self.last_result = None
 
     def make_choice(self):
         """
         Switch the move based on the last result.
         :return: The winning move based on the last result.
         """
-        if self.last_result is None or self.last_result == cfg.DRAW:
+        if len(self.own_history) == 0 or len(self.opp_history) == 0:
+            return random.choice(cfg.CHOICES)
+        
+        last_result = self.evaluate_hand(self.own_history[-1], self.opp_history[-1])
+
+        if last_result == cfg.DRAW:
             return random.choice(cfg.CHOICES)
         else:
             # Cycle through the choices
@@ -184,18 +163,10 @@ class SwitcherBot(RPSAI):
             next_index = (current_index + 1) % len(cfg.CHOICES)
             return cfg.CHOICES[next_index]
 
-    def update_history(self, own_move, opp_move):
-        """
-        Update the history of moves and the last result.
-        :param own_move: The move made by the AI.
-        :param opp_move: The move made by the opponent.
-        """
-        super().update_history(own_move, opp_move)
-        self.last_result = self.evaluate_hand(own_move, opp_move)
-
-class ReverseSwitcherBot(SwitcherBot):
+class ReverseSwitcherBot(RPSAI):
     """
     A bot that switches its move to cycle through the choices in reverse order.
+    Effectively chooses the move that would have lost to the last move it played.
     """
     NAME = "ReverseSwitcherBot"
 
@@ -204,10 +175,36 @@ class ReverseSwitcherBot(SwitcherBot):
         Switch the move based on the last result in reverse order.
         :return: The winning move based on the last result.
         """
-        if self.last_result is None or self.last_result == cfg.DRAW:
+        if len(self.own_history) == 0 or len(self.opp_history) == 0:
+            return random.choice(cfg.CHOICES)
+        
+        last_result = self.evaluate_hand(self.own_history[-1], self.opp_history[-1])
+
+        if last_result == cfg.DRAW:
             return random.choice(cfg.CHOICES)
         else:
-            # Cycle through the choices in reverse order
+            # Cycle through the choices
             current_index = cfg.CHOICES.index(self.own_history[-1])
             next_index = (current_index - 1) % len(cfg.CHOICES)
             return cfg.CHOICES[next_index]
+
+class UseUnused(RPSAI):
+    """
+    A bot that uses the move that was not used last round.
+    If the the last round was a draw, it chooses a random move.
+    """
+    NAME = "UseUnused"
+
+    def make_choice(self):
+        """
+        Use the move that was not used last round.
+        :return: The unused move.
+        """
+        if len(self.own_history) == 0:
+            return random.choice(cfg.CHOICES)
+        
+        # own_last_move = self.own_history[-1]
+        # opp_last_move = self.opp_history[-1]
+        unused_moves = [move for move in cfg.CHOICES if move != self.own_history[-1] and move != self.opp_history[-1]]
+        
+        return random.choice(unused_moves)

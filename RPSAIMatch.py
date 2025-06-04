@@ -67,12 +67,14 @@ class RPSAIMatch:
         if not headless:
             print("=================================================================")
         if round_number > self.max_rounds:
-            print(f"Match ended after {self.max_rounds} rounds without a winner.")
+            if not headless:
+                print(f"Match ended after {self.max_rounds} rounds without a winner.")
             self.scores[self.player_1.NAME] = 0
             self.scores[self.player_2.NAME] = 0
             return None, self.scores
         winner = self.player_1.NAME if self.scores[self.player_1.NAME] >= self.first_to else self.player_2.NAME
-        print(f"{winner} wins the match!")
+        if not headless:
+            print(f"{winner} wins the match!")
         return winner, self.scores
 
     def display_scores(self):
