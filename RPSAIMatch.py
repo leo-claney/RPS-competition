@@ -2,10 +2,10 @@ import config as cfg
 # Import the necessary AI classes
 from RPSAI import RPSAI
 from SimpleBots import RandomBot, AlwaysPaper, AlwaysRock, AlwaysScissors
-from PredictiveBots import RollingAveragesBot, InverseRollingAveragesBot, ConsistencyBot, ConfidentWinner
+from PredictiveBots import *
 
 class RPSAIMatch:
-    def __init__(self, player_1, player_2, first_to=100):
+    def __init__(self, player_1, player_2, first_to:int=100):
         """
         Initialize the match with two players and the winning score.
         :param player_1: The first player (AI).
@@ -16,6 +16,7 @@ class RPSAIMatch:
         self.player_2 = player_2
         self.first_to = first_to
         self.scores = {player_1.NAME: 0, player_2.NAME: 0}
+        self.max_rounds = first_to * 5  # Set a maximum number of rounds to avoid infinite loops
 
     def play_hand(self, headless=False):
         """
@@ -43,11 +44,11 @@ class RPSAIMatch:
             print(f"Starting match between {self.player_1.NAME} and {self.player_2.NAME}. First to {self.first_to} wins!")
             print("=================================================================")
             print()
-            round_number = 1
-        while self.scores[self.player_1.NAME] < self.first_to and self.scores[self.player_2.NAME] < self.first_to:
+        round_number = 1
+        while self.scores[self.player_1.NAME] < self.first_to and self.scores[self.player_2.NAME] < self.first_to and round_number <= self.max_rounds:
             if not headless:
                 print(f"Round {round_number}:")
-                round_number += 1
+            round_number += 1
             result = self.play_hand(headless=headless)
             if result == 1:
                 self.scores[self.player_1.NAME] += 1
@@ -65,9 +66,14 @@ class RPSAIMatch:
                     print()
         if not headless:
             print("=================================================================")
+        if round_number > self.max_rounds:
+            print(f"Match ended after {self.max_rounds} rounds without a winner.")
+            self.scores[self.player_1.NAME] = 0
+            self.scores[self.player_2.NAME] = 0
+            return None, self.scores
         winner = self.player_1.NAME if self.scores[self.player_1.NAME] >= self.first_to else self.player_2.NAME
         print(f"{winner} wins the match!")
-        return winner
+        return winner, self.scores
 
     def display_scores(self):
         """
@@ -77,7 +83,7 @@ class RPSAIMatch:
 
 def main():
     print("RPSAIMatch is ready to play a match between two AI players...")
-    player_1 = AlwaysPaper()
+    player_1 = ReverseSwitcherBot()
     player_2 = ConfidentWinner()
     match = RPSAIMatch(player_1, player_2, first_to=20)
     winner = match.play_match(headless=False)
