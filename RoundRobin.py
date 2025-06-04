@@ -158,7 +158,7 @@ def main():
     # display_results(sorted_records)
     
     # Run multiple tournaments and aggregate results
-    averaged_records, aggregated_records = multiple_tournaments(contestants, num_tournaments=25, first_to=100, tournament_headless=True, match_headless=True)
+    averaged_records, aggregated_records = multiple_tournaments(contestants, num_tournaments=200, first_to=100, tournament_headless=True, match_headless=True)
     sorted_averaged_records = sort_teams_by_pos(averaged_records)
     sorted_aggregated_records = sort_teams_by_points(aggregated_records)
     display_results_multiple(sorted_averaged_records, sorted_aggregated_records)

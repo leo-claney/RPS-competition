@@ -40,6 +40,14 @@ class RPSAI(ABC):
             return 1
         else:
             return -1
+    
+    def clear_history(self):
+        '''
+        Clear the history of moves.
+        This can be useful for resetting the AI's state.
+        '''
+        self.own_history.clear()
+        self.opp_history.clear()
 
 
 def main():

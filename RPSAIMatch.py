@@ -75,7 +75,15 @@ class RPSAIMatch:
         winner = self.player_1.NAME if self.scores[self.player_1.NAME] >= self.first_to else self.player_2.NAME
         if not headless:
             print(f"{winner} wins the match!")
+        self.reset_players()  # Reset players' histories for the next match
         return winner, self.scores
+
+    def reset_players(self):
+        """
+        Reset the players' histories.
+        """
+        self.player_1.clear_history()
+        self.player_2.clear_history()
 
     def display_scores(self):
         """
